@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}MailGuard{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<aside class="sidebar">
+  <div class="brand"><span class="brand-icon">M</span><span>MailGuard<small>EMAIL SECURITY</small></span></div>
+  <nav>
+    <a href="{{ url_for('dashboard') }}">◈ &nbsp; Dashboard</a>
+    <a href="{{ url_for('bulk') }}">▤ &nbsp; Bulk Scanner</a>
+    <a href="{{ url_for('analytics') }}">▥ &nbsp; Threat Analytics</a>
+  </nav>
+  <div class="side-note">Local machine-learning security demo</div>
+</aside>
+<main class="main">
+  <header><div><span class="muted">MAILGUARD /</span> {% block page %}OVERVIEW{% endblock %}</div><span class="status"><i></i> SYSTEM READY</span></header>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+  <footer>MailGuard · ML-assisted email security · Results are indicative, not a security guarantee.</footer>
+</main>
+</body></html>

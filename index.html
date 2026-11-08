@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | MailGuard{% endblock %}
+{% block page %}DASHBOARD{% endblock %}
+{% block content %}
+<section class="hero"><div><p class="eyebrow">THREAT DETECTION WORKSPACE</p><h1>Email security, made clearer.</h1><p class="muted">Scan suspicious messages, inspect links and understand why a message may be risky.</p></div><div class="hero-mark">✳</div></section>
+<div class="stats">
+  <div class="stat"><span>Latest batch scanned</span><strong>{{ stats.scanned }}</strong></div>
+  <div class="stat"><span>Spam / phishing</span><strong class="red">{{ stats.spam }}</strong></div>
+  <div class="stat"><span>High risk</span><strong class="orange">{{ stats.high }}</strong></div>
+  <div class="stat"><span>Low risk</span><strong class="green">{{ stats.low }}</strong></div>
+</div>
+<section class="panel">
+  <div class="panel-head"><div><p class="eyebrow">SINGLE MESSAGE SCAN</p><h2>Analyze an email</h2></div><span class="tag">TF-IDF + Naive Bayes + rules</span></div>
+  <form method="POST">
+    <label for="message">Email body or suspicious message</label>
+    <textarea id="message" name="message" placeholder="Paste the email text here..." required>{{ message }}</textarea>
+    <button class="primary" type="submit">Run security scan →</button>
+  </form>
+</section>
+{% if result %}
+<section class="panel result-panel">
+  <div class="result-top"><div><p class="eyebrow">SCAN RESULT</p><h2>{{ result.verdict }}</h2><span class="pill {{ result.risk_level|lower }}">{{ result.risk_level }} risk</span></div><div class="score"><strong>{{ result.risk_score }}</strong><span>/ 100 risk score</span></div></div>
+  <div class="meter"><span style="width:{{ result.risk_score }}%"></span></div>
+  <h3>Why this result?</h3><ul class="reason-list">{% for reason in result.reasons %}<li>{{ reason }}</li>{% endfor %}</ul>
+  <h3>URL and sender analysis</h3>
+  <p class="muted">Sender: {{ result.sender or "Not provided" }} · Language: {{ result.language }}</p>
+  {% if result.url_details %}{% for item in result.url_details %}<div class="url-card"><b>{{ item.domain }}</b><small>{{ item.url }}</small><p>{{ item.flags|join(" · ") if item.flags else "No configured URL red flags detected." }}</p></div>{% endfor %}{% else %}<p class="muted">No URLs found in this message.</p>{% endif %}
+  <p class="muted">Text model spam signal: {{ result.ml_spam_probability }}% (not a calibrated probability).</p>
+</section>
+{% endif %}
+<section class="panel"><div class="panel-head"><h2>Recent scan results</h2><a class="text-link" href="{{ url_for('analytics') }}">View analytics →</a></div>
+{% if recent %}<div class="table-wrap"><table><tr><th>Verdict</th><th>Risk score</th><th>Level</th><th>Language</th></tr>{% for r in recent %}<tr><td>{{ r.verdict }}</td><td>{{ r.risk_score }}/100</td><td><span class="pill {{ r.risk_level|lower }}">{{ r.risk_level }}</span></td><td>{{ r.language }}</td></tr>{% endfor %}</table></div>{% else %}<p class="muted">No messages scanned yet.</p>{% endif %}</section>
+{% endblock %}
